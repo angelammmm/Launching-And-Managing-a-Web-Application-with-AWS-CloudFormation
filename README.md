@@ -19,11 +19,11 @@ In one of my recent projects, I used CloudFormation to deploy a multi-tier web a
 - Basic knowledge of YAML/JSON (used for template syntax).
 
 ### Step 1: Create a CloudFormation Template
-A CloudFormation template defines the resources and dependencies for your infrastructure. Below is an updated example template (YAML) to create a scalable web application infrastructure with auto-scaling, a load balancer, security groups, and an S3 bucket:
+A CloudFormation template defines the resources and dependencies for your infrastructure. Below is an updated example template (YAML) to create a PHP-based website with a load balancer, auto-scaling, and security groups, accessible to all:
 
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Scalable Web Application Infrastructure
+Description: PHP Web Application Infrastructure
 
 Resources:
   # Security Group
@@ -73,6 +73,14 @@ Resources:
       InstanceType: t2.micro
       SecurityGroups:
         - Ref: WebServerSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd php
+          systemctl start httpd
+          systemctl enable httpd
+          echo "<?php echo 'Hello All, This Is My Website!'; ?>" > /var/www/html/index.php
 
   # S3 Bucket
   WebAppS3Bucket:
@@ -110,6 +118,8 @@ In my past projects, CloudFormation enabled:
 
 ## Conclusion
 AWS CloudFormation simplifies infrastructure management, enhances scalability, and reduces operational overhead. By leveraging IaC, you can achieve faster deployments, enforce consistency, and streamline DevOps workflows. If you haven't used CloudFormation yet, now is the time to start building your web applications with ease!
+
+
 
 
 
