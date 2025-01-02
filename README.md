@@ -1,4 +1,3 @@
-# Launching-And-Managing-a-Web-Application-with-AWS-CloudFormation
 # Launching and Managing a Web Application with AWS CloudFormation: Simplified Infrastructure as Code
 
 ## Introduction
