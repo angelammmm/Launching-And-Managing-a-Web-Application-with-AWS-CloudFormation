@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: PHP Web Application Infrastructure
+
+Resources:
+  # Security Group
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP and SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  # Application Load Balancer
+  WebAppLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: WebAppLoadBalancer
+      Subnets:
+        - subnet-abcde123  # Replace with valid subnet IDs
+        - subnet-fghij456
+      SecurityGroups:
+        - Ref: WebServerSecurityGroup
+      Scheme: internet-facing
+      Type: application
+
+  # Auto Scaling Group
+  WebServerAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref WebServerLaunchConfig
+      MinSize: 2
+      MaxSize: 5
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - subnet-abcde123
+        - subnet-fghij456
+
+  WebServerLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0abcdef1234567890  # Replace with a valid AMI ID
+      InstanceType: t2.micro
+      SecurityGroups:
+        - Ref: WebServerSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd php
+          systemctl start httpd
+          systemctl enable httpd
+          echo "<?php echo 'Hello All, This Is My Website!'; ?>" > /var/www/html/index.php
+
+  # S3 Bucket
+  WebAppS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: webapp-storage-bucket-12345 # Replace with a unique bucket name
