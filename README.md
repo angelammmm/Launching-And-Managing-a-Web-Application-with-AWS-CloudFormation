@@ -19,29 +19,66 @@ In one of my recent projects, I used CloudFormation to deploy a multi-tier web a
 - Basic knowledge of YAML/JSON (used for template syntax).
 
 ### Step 1: Create a CloudFormation Template
-A CloudFormation template defines the resources and dependencies for your infrastructure. Below is an example template (YAML) to create a web server using an EC2 instance and an attached security group:
+A CloudFormation template defines the resources and dependencies for your infrastructure. Below is an updated example template (YAML) to create a scalable web application infrastructure with auto-scaling, a load balancer, security groups, and an S3 bucket:
 
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Web Application Infrastructure
+Description: Scalable Web Application Infrastructure
+
 Resources:
-  WebServerInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: ami-0abcdef1234567890 # Replace with a valid AMI ID
-      InstanceType: t2.micro
-      SecurityGroups:
-        - Ref: WebServerSecurityGroup
-  
+  # Security Group
   WebServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable HTTP access
+      GroupDescription: Enable HTTP and SSH access
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  # Application Load Balancer
+  WebAppLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: WebAppLoadBalancer
+      Subnets:
+        - subnet-abcde123  # Replace with valid subnet IDs
+        - subnet-fghij456
+      SecurityGroups:
+        - Ref: WebServerSecurityGroup
+      Scheme: internet-facing
+      Type: application
+
+  # Auto Scaling Group
+  WebServerAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref WebServerLaunchConfig
+      MinSize: 2
+      MaxSize: 5
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - subnet-abcde123
+        - subnet-fghij456
+
+  WebServerLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0abcdef1234567890  # Replace with a valid AMI ID
+      InstanceType: t2.micro
+      SecurityGroups:
+        - Ref: WebServerSecurityGroup
+
+  # S3 Bucket
+  WebAppS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: webapp-storage-bucket-12345 # Replace with a unique bucket name
 ```
 
 ### Step 2: Deploy the Template
@@ -73,4 +110,6 @@ In my past projects, CloudFormation enabled:
 
 ## Conclusion
 AWS CloudFormation simplifies infrastructure management, enhances scalability, and reduces operational overhead. By leveraging IaC, you can achieve faster deployments, enforce consistency, and streamline DevOps workflows. If you haven't used CloudFormation yet, now is the time to start building your web applications with ease!
+
+
 
