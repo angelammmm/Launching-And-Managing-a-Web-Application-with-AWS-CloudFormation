@@ -1,4 +1,3 @@
-AWSTemplateFormatVersion: '2010-09-09'
 Description: PHP Web Application Infrastructure
 
 Resources:
@@ -45,7 +44,7 @@ Resources:
   WebServerLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      ImageId: ami-0abcdef1234567890  # Replace with a valid AMI ID
+      ImageId: ami- # Replace with a valid AMI ID
       InstanceType: t2.micro
       SecurityGroups:
         - Ref: WebServerSecurityGroup
