@@ -22,8 +22,8 @@ In one of my recent projects, I used CloudFormation to deploy a multi-tier web a
 A CloudFormation template defines the resources and dependencies for your infrastructure. Below is an updated example template (YAML) to create a PHP-based website with a load balancer, auto-scaling, and security groups, accessible to all:
 
 ```yaml
-AWSTemplateFormatVersion: '2010-09-09'
 Description: PHP Web Application Infrastructure
+
 
 Resources:
   # Security Group
@@ -69,7 +69,7 @@ Resources:
   WebServerLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      ImageId: ami-0abcdef1234567890  # Replace with a valid AMI ID
+      ImageId: ami- # Replace with a valid AMI ID
       InstanceType: t2.micro
       SecurityGroups:
         - Ref: WebServerSecurityGroup
